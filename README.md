@@ -17,10 +17,15 @@ A prerequisites it that all the mentioned Schema evolutions must be `BACKWARD_TR
 # What is the problem?
 The normal operation looks like this. Multiple (or a single) producers write records to the kafka topic.
 ![Normal operation](normal_operation.png)
-Things get complicated when a producer switches to a new Writer-Schema v2 (in this case `Producer A`). `Producer B` remains on Schema v1.For example a attribute ``
-![Schema evolution](schema_evolution.png)
-On more complex setups topics can have multiple producers. These producers may use different schema version when writing the data.
+Things get complicated when a producer switches to a new Writer-Schema v2 (in this case `Producer A`). `Producer B` remains on Schema v1. E.g. a attribute `myattribute` was added to the schema, resulting in schema version v2.
 So Deltastreamer must not only be able to handle Events that suddenly have a new Schema but also parallel operation of different Schema versions.
+![Schema evolution](schema_evolution.png)
+The default deserializer used by Hudi `io.confluent.kafka.serializers.KafkaAvroDeserializer` uses the schema that that exact record was written with for deserialization. This causes Hudi to get records with multiple different schema from the kafka client. E.g. some records have the new attribute `myattribute`, some dont. This makes things complicated and error-prone for Hudi.
+![Confluent Deserializer](confluent_deserializer.png)
+
+# Solution
+![KafkaAvroSchemaDeserializer](KafkaAvroSchemaDeserializer.png)
+
 
 # Deletion of attributes
 TODO: Not that easy. Say something about Uber-Schema. See FAQ Entry [Caused by: org.apache.parquet.io.InvalidRecordException: Parquet/Avro schema mismatch: Avro field 'col1' not found](https://cwiki.apache.org/confluence/display/HUDI/Troubleshooting+Guide#TroubleshootingGuide-1.1Causedby:org.apache.parquet.io.InvalidRecordException:Parquet/Avroschemamismatch:Avrofield'col1'notfound)
