@@ -1,6 +1,6 @@
 ---
 title: "The schema evolution story of Hudi"
-excerpt: "Evolve Avro Schema to keep data up with business"
+excerpt: "Evolve schema to keep data up to date with business"
 author: sbernauer
 category: blog
 ---
@@ -29,6 +29,10 @@ We can use a custom Deserializer `KafkaAvroSchemaDeserializer` and plug it into 
 As first step the Deserializer gets the source schema from the Hudi SchemaProvider. The SchemaProvider can get the schema for example from a Confluent Schema-Registry or a file.
 The Deserializer then reads the records from the topic with the schema the record was written. As next step it will convert all the records to the source schema from the SchemaProvider, in our case the latest schema. As a result, the kafka client will return all records with a unified schema. Hudi does not need to handle different schemas inside a single batch.
 ![KafkaAvroSchemaDeserializer](KafkaAvroSchemaDeserializer.png)
+
+# How to use this solution
+As of the coming release 0.9.0 the KafkaAvroSchemaDeserializer is not turned on by default, instead the normal Confluent Deseializer is used.
+You must set `hoodie.deltastreamer.source.kafka.value.deserializer.class=org.apache.hudi.utilities.deser.KafkaAvroSchemaDeserializer` to use the solution described in this blog post.
 
 # Deletion of attributes
 As noted in the FAQ Entry [Caused by: org.apache.parquet.io.InvalidRecordException: Parquet/Avro schema mismatch: Avro field 'col1' not found](https://cwiki.apache.org/confluence/display/HUDI/Troubleshooting+Guide#TroubleshootingGuide-1.1Causedby:org.apache.parquet.io.InvalidRecordException:Parquet/Avroschemamismatch:Avrofield'col1'notfound) deletion of attributes is not an easy thing.
