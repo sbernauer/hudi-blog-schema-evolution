@@ -25,6 +25,9 @@ The default deserializer used by Hudi `io.confluent.kafka.serializers.KafkaAvroD
 ![Confluent Deserializer](confluent_deserializer.png)
 
 # Solution
+We can use a custom Deserializer `KafkaAvroSchemaDeserializer` and plug it into the kafka client.
+As first step the Deserializer gets the source schema from the Hudi SchemaProvider. The SchemaProvider can get the schema for example from a Confluent Schema-Registry or a file.
+The Deserializer then reads the records from the topic with the schema the record was written. As next step it will convert all the records to the source schema from the SchemaProvider, in our case the latest schema. As a result, the kafka client will return all records with a unified schema. Hudi does not need to handle different schemas inside a single batch.
 ![KafkaAvroSchemaDeserializer](KafkaAvroSchemaDeserializer.png)
 
 # Deletion of attributes
