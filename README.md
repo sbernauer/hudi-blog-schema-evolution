@@ -31,4 +31,6 @@ The Deserializer then reads the records from the topic with the schema the recor
 ![KafkaAvroSchemaDeserializer](KafkaAvroSchemaDeserializer.png)
 
 # Deletion of attributes
-TODO: Not that easy. Say something about Uber-Schema. See FAQ Entry [Caused by: org.apache.parquet.io.InvalidRecordException: Parquet/Avro schema mismatch: Avro field 'col1' not found](https://cwiki.apache.org/confluence/display/HUDI/Troubleshooting+Guide#TroubleshootingGuide-1.1Causedby:org.apache.parquet.io.InvalidRecordException:Parquet/Avroschemamismatch:Avrofield'col1'notfound)
+As noted in the FAQ Entry [Caused by: org.apache.parquet.io.InvalidRecordException: Parquet/Avro schema mismatch: Avro field 'col1' not found](https://cwiki.apache.org/confluence/display/HUDI/Troubleshooting+Guide#TroubleshootingGuide-1.1Causedby:org.apache.parquet.io.InvalidRecordException:Parquet/Avroschemamismatch:Avrofield'col1'notfound) deletion of attributes is not an easy thing.
+in case wondering, deleting an optional attribute in an schema is a valid schema evolution for avro (see [Schema Evolution and Compatibility of Avro Schema changes](https://docs.confluent.io/platform/current/schema-registry/avro.html).
+It is currently not supported in Hudi but in the linked FAQ a way is described to fix this problem.
