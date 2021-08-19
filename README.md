@@ -16,19 +16,19 @@ A prerequisites it that all the mentioned Schema evolutions must be `BACKWARD_TR
 
 # What is the problem?
 The normal operation looks like this. Multiple (or a single) producers write records to the kafka topic.
-![Normal operation](/assets/images/blog/hudi-schema-evolution/normal_operation.png)
+![Normal operation](normal_operation.png)
 Things get complicated when a producer switches to a new Writer-Schema v2 (in this case `Producer A`). `Producer B` remains on Schema v1. E.g. a attribute `myattribute` was added to the schema, resulting in schema version v2.
 So Deltastreamer must not only be able to handle Events that suddenly have a new Schema but also parallel operation of different Schema versions.
-![Schema evolution](/assets/images/blog/hudi-schema-evolution/schema_evolution.png)
+![Schema evolution](schema_evolution.png)
 The default deserializer used by Hudi `io.confluent.kafka.serializers.KafkaAvroDeserializer` uses the schema that that exact record was written with for deserialization. This causes Hudi to get records with multiple different schema from the kafka client. E.g. Event #13 has the new attribute `myattribute`, Event #14 dont has the new attribute `myattribute`. This makes things complicated and error-prone for Hudi.
 
-![Confluent Deserializer](/assets/images/blog/hudi-schema-evolution/confluent_deserializer.png)
+![Confluent Deserializer](confluent_deserializer.png)
 
 # Solution
 We can use a custom Deserializer `KafkaAvroSchemaDeserializer` and plug it into the kafka client.
 As first step the Deserializer gets the source schema from the Hudi SchemaProvider. The SchemaProvider can get the schema for example from a Confluent Schema-Registry or a file.
 The Deserializer then reads the records from the topic with the schema the record was written. As next step it will convert all the records to the source schema from the SchemaProvider, in our case the latest schema. As a result, the kafka client will return all records with a unified schema. Hudi does not need to handle different schemas inside a single batch.
-![KafkaAvroSchemaDeserializer](/assets/images/blog/hudi-schema-evolution/KafkaAvroSchemaDeserializer.png)
+![KafkaAvroSchemaDeserializer](KafkaAvroSchemaDeserializer.png)
 
 # How to use this solution
 As of the coming release 0.9.0 the KafkaAvroSchemaDeserializer is not turned on by default, instead the normal Confluent Deseializer is used.
