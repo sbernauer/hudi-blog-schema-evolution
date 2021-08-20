@@ -19,7 +19,8 @@ The normal operation looks like this. Multiple (or a single) producers write rec
 In regular flow of events, all records are in the same schema v1 and is in sync with schema registry.
 ![Normal operation](normal_operation.png)<br>
 Things get complicated when a producer switches to a new Writer-Schema v2 (in this case `Producer A`). `Producer B` remains on Schema v1. E.g. a attribute `myattribute` was added to the schema, resulting in schema version v2.
-So DeltaStreamer must not only be able to handle Events that suddenly have a new Schema but also parallel operation of different Schema versions.
+Deltastreamer is capable of handling such schema evolution, if all incoming records were evolved and serialized with evolved schema. But the complication is that, some records are serialized with schema version v1 and some are serialized with schema version v2.
+
 ![Schema evolution](schema_evolution.png)<br>
 The default deserializer used by Hudi `io.confluent.kafka.serializers.KafkaAvroDeserializer` uses the schema that the record was serialized with for deserialization. This causes Hudi to get records with multiple different schema from the kafka client. E.g. Event #13 has the new attribute `myattribute`, Event #14 dont has the new attribute `myattribute`. This makes things complicated and error-prone for Hudi.
 
