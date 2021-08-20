@@ -27,7 +27,7 @@ The default deserializer used by Hudi `io.confluent.kafka.serializers.KafkaAvroD
 ![Confluent Deserializer](confluent_deserializer.png)<br>
 
 # Solution
-Hudi added a new custom Deserializer `KafkaAvroSchemaDeserializer` to solve this problem of different producers producing records in different schema versions, but to use the latest schema from schema registry to deserialize all the records
+Hudi added a new custom Deserializer `KafkaAvroSchemaDeserializer` to solve this problem of different producers producing records in different schema versions, but to use the latest schema from schema registry to deserialize all the records.<br>
 As first step the Deserializer gets the latest schema from the Hudi SchemaProvider. The SchemaProvider can get the schema for example from a Confluent Schema-Registry or a file.
 The Deserializer then reads the records from the topic with the schema the record was written. As next step it will convert all the records to the latest schema from the SchemaProvider, in our case the latest schema. As a result, the kafka client will return all records with a unified schema i.e. the latest schema as per schema registry. Hudi does not need to handle different schemas inside a single batch.
 
